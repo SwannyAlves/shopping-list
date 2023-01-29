@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import * as S from "./styles";
 
 interface ItemProps {
@@ -12,6 +12,30 @@ interface ItemProps {
     categoria: string;
     valorTotal: number;
   };
+  list: {
+    id: number;
+    nome: string;
+    quantidade: number;
+    valorDaUnidade: number;
+    quantidadeEmEstoque: number;
+    icone: string;
+    categoria: string;
+    valorTotal: number;
+  }[];
+  setList: Dispatch<
+    SetStateAction<
+      {
+        id: number;
+        nome: string;
+        quantidade: number;
+        valorDaUnidade: number;
+        quantidadeEmEstoque: number;
+        icone: string;
+        categoria: string;
+        valorTotal: number;
+      }[]
+    >
+  >;
 }
 
 export const Item = ({
@@ -24,33 +48,91 @@ export const Item = ({
     categoria,
     valorTotal,
   },
+  list,
+  setList,
 }: ItemProps) => {
-  //   const [quantidadeEmCasa, setQuantidadeEmCasa] = useLocalStorage(
-  //     "Quantidade em casa",
-  //     quantidadeEmEstoque
-  //   );
-
   const [quantidadeEmCasa, setQuantidadeEmCasa] = useState(quantidadeEmEstoque);
 
   const [quantidadeMercado, setQuantidadeMercado] = useState(quantidade);
 
   const [valorUnitario, setValorUnitario] = useState(valorDaUnidade.toString());
 
-  const handleAddHome = () => {
+  const handleAddHome = (produto: string) => {
+    const newList = list.map((item) => {
+      if (item.nome === produto) {
+        return {
+          ...item,
+          quantidadeEmEstoque: item.quantidadeEmEstoque + 1,
+        };
+      }
+      return item;
+    });
+
+    setList(newList);
+
     setQuantidadeEmCasa(quantidadeEmCasa + 1);
   };
 
-  const handleRemoveHome = () => {
+  const handleRemoveHome = (produto: string) => {
+    const newList = list.map((item) => {
+      if (item.nome === produto) {
+        return {
+          ...item,
+          quantidadeEmEstoque: item.quantidadeEmEstoque - 1,
+        };
+      }
+      return item;
+    });
+
+    setList(newList);
     setQuantidadeEmCasa(quantidadeEmCasa - 1);
   };
 
-  const handleAddMarket = () => {
+  const handleAddMarket = (produto: string) => {
+    const newList = list.map((item) => {
+      if (item.nome === produto) {
+        return {
+          ...item,
+          quantidade: item.quantidade + 1,
+        };
+      }
+      return item;
+    });
+
+    setList(newList);
     setQuantidadeMercado(quantidadeMercado + 1);
   };
 
-  const handleRemoveMarket = () => {
+  const handleRemoveMarket = (produto: string) => {
+    const newList = list.map((item) => {
+      if (item.nome === produto) {
+        return {
+          ...item,
+          quantidade: item.quantidade - 1,
+        };
+      }
+      return item;
+    });
+
+    setList(newList);
     setQuantidadeMercado(quantidadeMercado - 1);
   };
+
+  const handlerValorTotal = (produto: string) => {
+    const newList = list.map((item) => {
+      if (item.nome === produto) {
+        return {
+          ...item,
+          valorTotal: quantidadeMercado * parseFloat(valorUnitario),
+        };
+      }
+      return item;
+    });
+
+    setList(newList);
+  };
+
+  console.log(valorTotal, nome);
 
   return (
     <S.Wrapper>
@@ -58,21 +140,21 @@ export const Item = ({
 
       <div>
         <S.Title>
-          {nome} - {quantidadeEmCasa}
+          {nome} - {quantidadeEmEstoque}
         </S.Title>
         <div>
           <p>
             Quantos tem em casa? {quantidadeEmCasa}
             <button
               onClick={() => {
-                handleRemoveHome();
+                handleRemoveHome(nome);
               }}
             >
               -
             </button>
             <button
               onClick={() => {
-                handleAddHome();
+                handleAddHome(nome);
               }}
             >
               +
@@ -83,14 +165,14 @@ export const Item = ({
             Quanto peguei no mercado? {quantidadeMercado}
             <button
               onClick={() => {
-                handleRemoveMarket();
+                handleRemoveMarket(nome);
               }}
             >
               -
             </button>
             <button
               onClick={() => {
-                handleAddMarket();
+                handleAddMarket(nome);
               }}
             >
               +
@@ -100,8 +182,10 @@ export const Item = ({
           <input
             onChange={(event) => {
               setValorUnitario(event.target.value);
+              // handlerValorTotal(nome);
             }}
           />
+          <button onClick={() => handlerValorTotal(nome)}>Calcular</button>
         </div>
         <p>Total {quantidadeMercado * parseFloat(valorUnitario)}</p>
       </div>
