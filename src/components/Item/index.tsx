@@ -103,10 +103,7 @@ export const Item = ({
             }}
           />
         </div>
-        <p>
-          Total{" "}
-          {(quantidadeEmCasa + quantidadeMercado) * parseFloat(valorUnitario)}
-        </p>
+        <p>Total {quantidadeMercado * parseFloat(valorUnitario)}</p>
       </div>
     </S.Wrapper>
   );
